@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs Analyzer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            display: flex;
+        }
+        header {
+            background-color: #4682b4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 1000; /* Ensure it stays on top */
+        }
+        nav {
+            background-color: #333;
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 60px; /* Just below the header */
+            bottom: 0;
+        }
+        nav a {
+            padding: 14px 20px;
+            color: white;
+            text-align: left;
+            text-decoration: none;
+        }
+        nav a:hover {
+            background-color: #575757;
+        }
+        main {
+            padding: 20px;
+            flex-grow: 1;
+            margin-left: 200px; /* Avoid overlap with nav */
+            margin-top: 100px; /* Avoid overlap with header */
+        }
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        footer {
+            background-color: #4682b4;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+		.dropdown {
+            float: left;
+            overflow: hidden;
+        }
+        .dropdown .dropbtn {
+            font-size: 16px;
+            border: none;
+            outline: none;
+            color: white;
+            padding: 14px 16px;
+            background-color: inherit;
+            font-family: inherit;
+            margin: 0;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-content a {
+            float: none;
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+        .dropdown-content a:hover {
+            background-color: #575757;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Jobs Analyzer</h1>
+</header>
+
+<nav>
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'Oferty_pracy' %}">Oferty pracy</a>
+    <a href="{% url 'Analiza_opisowa' %}">Analiza Opisowa</a>
+    <a href="{% url 'Analiza_ofert' %}">Analiza Ofert Pracy</a>
+    <a href="{% url 'Analiza_pensje' %}">Analiza Pensji</a>
+    <a href="{% url 'Analiza_ilosc_ofert' %}">Analiza Ilości Ofert</a>
+    <a href="{% url 'Analiza_ilosc_ofert_2' %}">Analiza Ilości Ofert w czasie</a>
+</nav>
+
+<main>
+    <div class="card">
+        <h2>Brak danych!</h2>
+        <p> </p>
+    </div>
+    
+</main>

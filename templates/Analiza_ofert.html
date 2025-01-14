@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobs Analyzer</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            display: flex;
+        }
+        header {
+            background-color: #4682b4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+        nav {
+            background-color: #333;
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+        }
+        nav a {
+            padding: 14px 20px;
+            color: white;
+            text-align: left;
+            text-decoration: none;
+        }
+        nav a:hover {
+            background-color: #575757;
+        }
+        main {
+            padding: 20px;
+            flex-grow: 1;
+            margin-left: 200px;
+            margin-top: 100px;
+        }
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        footer {
+            background-color: #4682b4;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+        .dropdown .dropbtn {
+            font-size: 16px;
+            border: none;
+            outline: none;
+            color: white;
+            padding: 10px 20px;
+            background-color: #4682b4;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        .dropdown .dropbtn:hover {
+            background-color: #5a9bd3;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            color: white;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+        }
+        .dropdown-content a {
+            float: none;
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        .dropdown-content a:hover {
+            background-color: #575757;
+            border-radius: 5px;
+        }
+        form {
+            display: inline-block;
+            margin: 0;
+        }
+        button[type="submit"] {
+            background-color: #4682b4;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        button[type="submit"]:hover {
+            background-color: #5a9bd3;
+        }
+        .button-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .button-container form {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Jobs Analyzer</h1>
+</header>
+
+<nav>
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'Oferty_pracy' %}">Oferty pracy</a>
+    <a href="{% url 'Analiza_opisowa' %}">Analiza Opisowa</a>
+    <a href="{% url 'Analiza_ofert' %}">Analiza Ofert Pracy</a>
+    <a href="{% url 'Analiza_pensje' %}">Analiza Pensji</a>
+    <a href="{% url 'Analiza_ilosc_ofert' %}">Analiza Ilości Ofert</a>
+    <a href="{% url 'Analiza_ilosc_ofert_2' %}">Analiza Ilości Ofert w czasie</a>
+</nav>
+
+<main>
+    <div class="card">
+        <h2>Analiza Ofert Pracy</h2>
+        
+        
+        <div class="button-container">
+    
+            <div class="dropdown">
+                <button class="dropbtn">Filtr:
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <form method="post" autocomplete="off">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit">Filtruj</button>
+                    </form>
+                </div>
+            </div>
+        
+        
+        <form method="post" action="{% url 'Analiza' %}">
+            {% csrf_token %}
+            <button type="submit" name="wyczysc_filtr" value="1">Wyczyść filtry</button>
+        </form>
+            
+        </div>
+        
+        <div class="card">
+        <img src="{{ chart_1 }}" alt="Wykres_1">
+        </div>    
+        
+        <div class="card">
+        <img src="{{ chart_2 }}" alt="Wykres_2">
+        </div>   
+        
+        <div class="card">
+        <img src="{{ chart_3 }}" alt="Wykres_3">
+        </div>   
+        
+        <div class="card">
+        <img src="{{ chart_4 }}" alt="Wykres_4">
+        </div>   
+        
+        <div class="card">
+        <img src="{{ chart_5 }}" alt="Wykres_5">
+        </div>  
+        
+        <div class="card">
+        <img src="{{ chart_6 }}" alt="Wykres_6">
+        </div>  
+         
+
+    </div>
+    
+    
+    
+    
+    
+</main>
+
+<script>
+    // Funkcja otwierająca i zamykająca rozwijane menu po kliknięciu przycisku
+    document.querySelector('.dropbtn').addEventListener('click', function() {
+        var dropdownContent = this.nextElementSibling;
+        dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Funkcja zamykająca rozwijane menu po kliknięciu poza nim
+    window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn') && !event.target.closest('.dropdown-content')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.style.display === 'block') {
+                    openDropdown.style.display = 'none';
+                }
+            }
+        }
+    }
+</script>

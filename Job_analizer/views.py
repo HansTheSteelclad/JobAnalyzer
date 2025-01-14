@@ -24,7 +24,7 @@ import numpy as np
 import requests
 from collections import defaultdict
 import pandas as pd
-
+from django.shortcuts import render
 # Globals
 global nr_strony, nazwa_miasta, nazwa_zawodu, odleglosc, minimalna
 nr_strony = 1
@@ -1039,7 +1039,7 @@ def analiza_opisowa_dane(url, params):
 
 # Views
 def home(request):
-    return render(request, "index.html")
+    return render(request, "Home.html")
 
 def oferty_pracy_disp(request):
     # id i klucze
