@@ -1319,7 +1319,7 @@ def analiza_ilosc_2(request):
         dates = [start_date + dt.timedelta(days=(i // increment)) for i in range(n)]
         return dates
 
-    file_path = "Job_analizer/Jobs_data.xlsx"
+    file_path = "Jobs_data.xlsx"
     saved_data = pd.read_excel(file_path, sheet_name='Sheet1')
 
     # Data początkowa
