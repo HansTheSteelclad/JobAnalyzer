@@ -24,6 +24,7 @@ import numpy as np
 import requests
 from collections import defaultdict
 import pandas as pd
+import json
 from django.shortcuts import render
 # Globals
 global nr_strony, nazwa_miasta, nazwa_zawodu, odleglosc, minimalna
@@ -1313,15 +1314,12 @@ def analiza_opisowa(request):
     return render(request, "Analiza_opisowa.html", zawartosc)
 
 def analiza_ilosc_2(request):
-    import json
-    import numpy as np
-    import matplotlib.pyplot as plt
 
     def generate_dates(n, start_date, increment):
         dates = [start_date + dt.timedelta(days=(i // increment)) for i in range(n)]
         return dates
 
-    file_path = "Deployment_version/Jobs_data.xlsx"
+    file_path = "Job_analizer/Jobs_data.xlsx"
     saved_data = pd.read_excel(file_path, sheet_name='Sheet1')
 
     # Data początkowa
