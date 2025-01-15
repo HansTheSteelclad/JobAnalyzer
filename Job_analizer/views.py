@@ -1243,11 +1243,11 @@ def analiza_ilosc(request):
     }
 
     if request.method == 'POST':
-        form = MyForm_1(request.POST)
+        form = MyForm_3(request.POST)
         if form.is_valid():
 
             #if form.cleaned_data['zawod_wykres']:
-            nazwa_zawodu_wykres = form.cleaned_data['zawod_wykres']
+            nazwa_zawodu_wykres = form.cleaned_data['zawod_wykres_2']
             params['what'] = str(nazwa_zawodu_wykres)
 
             wyczysc_filtr = request.POST.get('wyczysc_filtr')
