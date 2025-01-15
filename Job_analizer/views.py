@@ -7,9 +7,9 @@ import io
 import urllib, base64
 import matplotlib
 import matplotlib.colors as mcolors
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 import matplotlib.dates as mdates
 import statsmodels.api as sm
 from datetime import datetime
@@ -20,7 +20,7 @@ import datetime as dt
 import calendar
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 import textwrap
 import numpy as np
 import requests
