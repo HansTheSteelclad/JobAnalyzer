@@ -7,9 +7,9 @@ import io
 import urllib, base64
 import matplotlib
 import matplotlib.colors as mcolors
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 import matplotlib.dates as mdates
 import statsmodels.api as sm
 from datetime import datetime
@@ -20,7 +20,7 @@ import datetime as dt
 import calendar
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('TkAgg')
+matplotlib.use('Agg')
 import textwrap
 import numpy as np
 import requests
@@ -1238,16 +1238,16 @@ def analiza_ilosc(request):
         'app_id': API_ID,
         'app_key': API_KEY,
         'results_per_page': 50,
-        'what': 'software developer',  # przykładowe wyszukiwanie
+        'what': '',  # przykładowe wyszukiwanie
         # 'where': 'Warsaw'
     }
 
     if request.method == 'POST':
-        form = MyForm_1(request.POST)
+        form = MyForm_3(request.POST)
         if form.is_valid():
 
             #if form.cleaned_data['zawod_wykres']:
-            nazwa_zawodu_wykres = form.cleaned_data['zawod_wykres']
+            nazwa_zawodu_wykres = form.cleaned_data['zawod_wykres_2']
             params['what'] = str(nazwa_zawodu_wykres)
 
             wyczysc_filtr = request.POST.get('wyczysc_filtr')
@@ -1321,9 +1321,11 @@ def analiza_ilosc_2(request):
         dates = [start_date + dt.timedelta(days=(i // increment)) for i in range(n)]
         return dates
 
-    BASE_DIR = os.Path('Job_analizer').resolve().parent.parent  # Corrected BASE_DIR
-    file_path = os.path.join(BASE_DIR, "Job_analizer", "Jobs_data.xlsx")  # Corrected file path
-    saved_data = pd.read_excel(file_path, sheet_name='Sheet1')  # Ensure pandas is correctly used
+    #BASE_DIR = os.Path('Job_analizer').resolve().parent.parent  # Corrected BASE_DIR
+    #file_path = os.path.join(BASE_DIR, "Job_analizer", "Jobs_data.xlsx")  # Corrected file path
+    #saved_data = pd.read_excel(file_path, sheet_name='Sheet1')  # Ensure pandas is correctly used
+    saved_data = pd.read_excel('/opt/render/project/src/Job_analizer/Jobs_data.xlsx',sheet_name='Sheet1')
+
 
     # Data początkowa
     start_date = datetime(2024, 12, 15)
