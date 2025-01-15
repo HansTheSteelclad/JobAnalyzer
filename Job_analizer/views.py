@@ -187,7 +187,7 @@ def create_plot(url, params):
                 # Dodanie tytułów i etykiet osi
                 plt.title('Porównanie minimalnego i maksymalnego wynagrodzenia w ofertach pracy')
                 plt.xlabel('Firma')
-                plt.ylabel('Wynagrodzenie (PLN)')
+                plt.ylabel('Wynagrodzenie')
                 plt.xticks(x, wrapped_labels, rotation=45, ha='right')  # Etykiety na osi X (nazwy firm)
                 plt.legend()
 
@@ -872,7 +872,7 @@ def analiza_opisowa_dane(url, params):
         regions, countss = zip(*sorted_regions)
         slowo = "województwo "
         top_region = regions[0]
-        if top_region != "Polska":
+        if top_region != "Polska" and top_region != "Trójmiasto":
             top_region = slowo + top_region
         top_region_counts = countss[0]
         sum_counts_regions = sum(countss)
@@ -1238,7 +1238,7 @@ def analiza_ilosc(request):
         'app_id': API_ID,
         'app_key': API_KEY,
         'results_per_page': 50,
-        'what': 'software developer',  # przykładowe wyszukiwanie
+        'what': '',  # przykładowe wyszukiwanie
         # 'where': 'Warsaw'
     }
 
