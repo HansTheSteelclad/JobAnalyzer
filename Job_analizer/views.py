@@ -2,7 +2,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, HttpResponse
 from .forms import *
 import os
-from os import path
+import os.path
 import io
 import urllib, base64
 import matplotlib
@@ -1190,7 +1190,7 @@ def analiza_wykresy(request):
         chart_6 = chart_tab[5]
 
     except:
-        return render(request, "error.html", {'form': form})
+        return render(request, "Error.html", {'form': form})
 
 
     return render(request, "Analiza_ofert.html", {'form': form, 'chart_1': chart_1, 'chart_2': chart_2, 'chart_3': chart_3, 'chart_4': chart_4, 'chart_5': chart_5, 'chart_6': chart_6})
@@ -1223,7 +1223,7 @@ def analiza_pensje(request):
     try:
         chart_1 = create_plot_earnings(url)
     except:
-        return render(request, "error.html", {'form': form})
+        return render(request, "Error.html", {'form': form})
 
     return render(request, "Analiza_pensji.html", {'form': form, 'chart_1': chart_1})
 
@@ -1262,7 +1262,7 @@ def analiza_ilosc(request):
         chart_1 = chart_tab[0]
         chart_2 = chart_tab[1]
     except:
-        return render(request, "error.html", {'form': form})
+        return render(request, "Error.html", {'form': form})
 
     return render(request, "Analiza_ilosci_ofert.html", {'form': form, 'chart_1': chart_1, 'chart_2': chart_2})
 
@@ -1311,7 +1311,7 @@ def analiza_opisowa(request):
         zawartosc = analiza_opisowa_dane(url, params)
         zawartosc['form'] = form
     except:
-        return render(request, "error.html", {'form': form})
+        return render(request, "Error.html", {'form': form})
 
     return render(request, "Analiza_opisowa.html", zawartosc)
 
@@ -1321,9 +1321,11 @@ def analiza_ilosc_2(request):
         dates = [start_date + dt.timedelta(days=(i // increment)) for i in range(n)]
         return dates
 
-    BASE_DIR = path(__file__).resolve().parent.parent  # Adjusted to resolve the base directory
-    file_path = os.path.join(BASE_DIR, "Job_analizer", "Jobs_data.xlsx")
-    saved_data = pd.read_excel(file_path, sheet_name='Sheet1')
+    #BASE_DIR = os.Path('Job_analizer').resolve().parent.parent  # Corrected BASE_DIR
+    #file_path = os.path.join(BASE_DIR, "Job_analizer", "Jobs_data.xlsx")  # Corrected file path
+    #saved_data = pd.read_excel(file_path, sheet_name='Sheet1')  # Ensure pandas is correctly used
+    saved_data = pd.read_excel('/opt/render/project/src/Job_analizer/Jobs_data.xlsx',sheet_name='Sheet1')
+
 
     # Data początkowa
     start_date = datetime(2024, 12, 15)
