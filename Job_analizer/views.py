@@ -1,6 +1,8 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, HttpResponse
 from .forms import *
+import os
+from os import path
 import io
 import urllib, base64
 import matplotlib
@@ -1319,7 +1321,8 @@ def analiza_ilosc_2(request):
         dates = [start_date + dt.timedelta(days=(i // increment)) for i in range(n)]
         return dates
 
-    file_path = "./Deployment_version/Job_analizer/Jobs_data.xlsx"
+    BASE_DIR = path(__file__).resolve().parent.parent  # Adjusted to resolve the base directory
+    file_path = os.path.join(BASE_DIR, "Job_analizer", "Jobs_data.xlsx")
     saved_data = pd.read_excel(file_path, sheet_name='Sheet1')
 
     # Data początkowa
