@@ -87,12 +87,11 @@ def create_plot(url, params):
 
     # Sprawdzenie, czy w odpowiedzi są wyniki
     if 'results' in response_json and response_json['results']:
-        jobs = []  # Lista, w której będziemy przechowywać oferty pracy
-        region_count = defaultdict(int)  # Słownik do zliczania ofert w województwach
-        # salary_data = []  # Lista, w której będziemy przechowywać dane o wynagrodzeniu
-        company_count = defaultdict(int)  # Słownik do zliczania ofert w firmach
-        job_count = defaultdict(int)  # Słownik do zliczania ofert według stanowisk
-        salary_data = defaultdict(int)  # Słownik: klucz=(company_name, salary_min, salary_max), wartość=liczba ofert
+        jobs = []
+        region_count = defaultdict(int)
+        company_count = defaultdict(int)
+        job_count = defaultdict(int)
+        salary_data = defaultdict(int)
 
         # Pętla po wynikach
         for i in response_json['results']:
@@ -104,53 +103,34 @@ def create_plot(url, params):
             location = i.get('location', {}).get('display_name', 'Brak lokalizacji')
             description = i.get('description', 'Brak opisu')
 
-            salary_min = i.get('salary_min', None)  # Minimalne wynagrodzenie
-            salary_max = i.get('salary_max', None)  # Maksymalne wynagrodzenie
+            salary_min = i.get('salary_min', None)
+            salary_max = i.get('salary_max', None)
 
             if salary_min is not None and salary_max is not None:
-                # Dodawanie unikalnych kombinacji firmy i widełek wynagrodzenia
                 salary_data[(company_name, salary_min, salary_max)] += 1
 
-            # Przypisanie województwa
-            region = location.split(",")[-1].strip()  # Zakłada się, że województwo jest na końcu lokalizacji
+            region = location.split(",")[-1].strip()
 
-            # Zliczanie ofert pracy w województwie
             region_count[region] += 1
 
-            # Zliczanie ofert pracy w firmach
             company_count[company_name] += 1
 
-            # Zliczanie ofert pracy według stanowisk
             job_count[job_title] += 1
 
-            # Dodanie oferty do listy jobs
             job.append(job_title)
             job.append(company_name)
             job.append(location)
             job.append(description)
 
-            # Dodanie do ogólnej listy 'jobs'
             jobs.append(job)
 
-            # Wypisanie szczegółów oferty
-            # print(f"Job Title: {job_title}")
-            # print(f"Company: {company_name}")
-            # print(f"Location: {location}")
-            # print(f"Description: {description}\n")
-
-        # Sortowanie województw według liczby ofert
         sorted_regions = sorted(region_count.items(), key=lambda x: x[1], reverse=True)
 
-        # Sortowanie firm według liczby ofert
         sorted_companies = sorted(company_count.items(), key=lambda x: x[1], reverse=True)
 
-        # Sortowanie stanowisk według liczby ofert
         sorted_jobs = sorted(job_count.items(), key=lambda x: x[1], reverse=True)
 
-        # Wybieramy tylko top 10 zawodów
         top_10_jobs = sorted(sorted_jobs[:10], key=lambda x: x[1], reverse=False)
-
-
 
         cols = ['xkcd:purple', 'xkcd:green', 'xkcd:blue', 'xkcd:pink', 'xkcd:brown', 'xkcd:red', 'xkcd:orange',
                 'xkcd:yellow', 'xkcd:grey', 'xkcd:teal', 'xkcd:light green', 'xkcd:light purple',
@@ -165,30 +145,26 @@ def create_plot(url, params):
                 'xkcd:dark orange']
 
         # WYKRES 1
+
         try:
             if salary_data:
-                # Rozpakowanie danych o wynagrodzeniu do osobnych list
                 companies, min_salaries, max_salaries = zip(*salary_data)
 
-                # Ustawienie szerokości słupków dla wykresu
-                x = np.arange(len(companies))  # Pozycje dla firm
-                width = 0.20  # Szerokość słupka
+                x = np.arange(len(companies))
+                width = 0.20
 
-                # Tworzymy wykres
                 plt.figure(figsize=(10, 7))
 
-                # Rysowanie słupków (minimalne i maksymalne wynagrodzenia)
                 plt.bar(x - width / 2, min_salaries, width, label='Minimalne wynagrodzenie', color='mediumaquamarine')
                 plt.bar(x + width / 2, max_salaries, width, label='Maksymalne wynagrodzenie', color='salmon')
 
-                max_length = 20  # Ustawiamy maksymalną długość jednej linii
+                max_length = 20
                 wrapped_labels = [textwrap.fill(company, width=max_length) for company in companies]
 
-                # Dodanie tytułów i etykiet osi
                 plt.title('Porównanie minimalnego i maksymalnego wynagrodzenia w ofertach pracy')
                 plt.xlabel('Firma')
-                plt.ylabel('Wynagrodzenie')
-                plt.xticks(x, wrapped_labels, rotation=45, ha='right')  # Etykiety na osi X (nazwy firm)
+                plt.ylabel('Wynagrodzenie (PLN)')
+                plt.xticks(x, wrapped_labels, rotation=45, ha='right')
                 plt.legend()
 
                 plt.gca().spines['left'].set_color('black')
@@ -200,11 +176,7 @@ def create_plot(url, params):
                 plt.gca().spines['top'].set_color('black')
                 plt.gca().spines['top'].set_linewidth(2)
 
-                # Dopasowanie układu z dodatkowymi marginesami na dole
-                plt.tight_layout(pad=2.0)  # Zwiększono margines, aby uniknąć obcinania etykiet
-
-                #plt.show()
-
+                plt.tight_layout(pad=2.0)
 
                 buf = io.BytesIO()
                 plt.savefig(buf, format='png')
@@ -219,19 +191,16 @@ def create_plot(url, params):
         try:
 
             # Tworzenie wykresu słupkowego
-            regions, counts = zip(*sorted_regions)  # Rozpakowanie krotek do dwóch list (regiony i liczba ofert)
+            regions, counts = zip(*sorted_regions)
 
-            # Tworzymy wykres za pomocą matplotlib.pyplot
-            plt.figure(figsize=(10, 6))  # Ustalamy wielkość wykresu
+            plt.figure(figsize=(10, 6))
             colors = cols[:len(regions)]
-            plt.bar(regions, counts, color=colors)  # Tworzenie wykresu słupkowego
+            plt.bar(regions, counts, color=colors)
 
-            # Dodanie tytułu i etykiet osi
             plt.title('Liczba ofert pracy w poszczególnych województwach')
             plt.xlabel('Województwa')
             plt.ylabel('Liczba ofert pracy')
 
-            # Obrót nazw województw na osi X
             plt.xticks(rotation=45, ha='right')
 
             plt.gca().spines['left'].set_color('black')
@@ -243,14 +212,9 @@ def create_plot(url, params):
             plt.gca().spines['top'].set_color('black')
             plt.gca().spines['top'].set_linewidth(2)
 
-            # Dopasowanie układu z dodatkowymi marginesami na dole
-            plt.tight_layout(pad=2.0)  # Zwiększono margines, aby uniknąć obcinania etykiet
+            plt.tight_layout(pad=2.0)
 
-            # Ustawienie liczb całkowitych na osi X
             plt.yticks(np.arange(0, max(counts) + 1, 2))
-
-            # Pokazanie wykresu
-            #plt.show()
 
             buf = io.BytesIO()
             plt.savefig(buf, format='png')
@@ -266,25 +230,20 @@ def create_plot(url, params):
         try:
 
             # Tworzenie wykresu kołowego
-            companies, counts = zip(*sorted_companies)  # Rozpakowanie krotek do dwóch list (firmy i liczba ofert)
+            companies, counts = zip(*sorted_companies)
 
             explode = tuple([0.025] * len(companies))
 
-            plt.figure(figsize=(10,6))  # Ustalamy wielkość wykresu
+            plt.figure(figsize=(10,6))
             plt.pie(counts, labels=companies, autopct='%1.1f%%', startangle=90,
                     colors=cols,
                     textprops={'fontsize': 6},
                     explode=explode
                     )
 
-
-            # Dodanie tytułu wykresu
             plt.title('Procentowy rozkład liczby ofert pracy w firmach')
 
-            # Pokazanie wykresu
-            plt.axis('equal')  # Upewniamy się, że wykres będzie okrągły
-
-            #plt.show()
+            plt.axis('equal')
 
             buf = io.BytesIO()
             plt.savefig(buf, format='png')
@@ -300,38 +259,29 @@ def create_plot(url, params):
 
         try:
 
-            # Tworzenie wykresu słupkowego poziomego
-            job_titles, counts = zip(*top_10_jobs)  # Rozpakowanie krotek do dwóch list (stanowiska i liczba ofert)
+            job_titles, counts = zip(*top_10_jobs)
 
-            # Tworzenie wykresu
-            plt.figure(figsize=(10, 6))  # Ustawiamy szerokość i wysokość wykresu
+            plt.figure(figsize=(10, 6))
             bars = plt.barh(job_titles, counts,
-                     color=list(mcolors.TABLEAU_COLORS))  # Tworzymy wykres słupkowy poziomy
+                     color=list(mcolors.TABLEAU_COLORS))
 
-            # Dodanie tytułu i etykiet osi
             plt.title('Top 10 zawodów z największą liczbą ofert pracy')
             plt.xlabel('Liczba ofert')
             plt.ylabel('')
 
-            # Dopasowanie układu wykresu
             plt.tight_layout(pad=1.0)
-            plt.subplots_adjust(left=0.03, right=0.55,top=0.95, bottom=0.05)  # Zmniejsz prawy margines (sprawi, że wszystko będzie bardziej na lewo)
+            plt.subplots_adjust(left=0.03, right=0.55,top=0.95, bottom=0.05)
 
+            plt.yticks(fontsize=10, color='white')
 
-            # Dopasowanie czcionki etykiet (jeśli są zbyt długie)
-            plt.yticks(fontsize=10, color='white')  # Można zmniejszyć czcionkę etykiet na osi Y
-
-            # Umieszczenie nazw firm za słupkami (po prawej stronie)
             for bar, job in zip(bars, job_titles):
-                width = bar.get_width()  # Pobierz szerokość słupka (liczba ofert)
-                y_position = bar.get_y()  # Pobierz nazwę stanowiska (na osi Y)
+                width = bar.get_width()
+                y_position = bar.get_y()
 
-                # Wstawienie etykiety z nazwą firmy po prawej stronie słupka
-                plt.text(width + 0.1, y_position + bar.get_height() / 2,  # Pozycjonowanie etykiety
-                         job,  # Nazwa stanowiska (firma)
-                         va='center', ha='left', fontsize=10, color='purple',fontweight='bold')  # Ustawienie wyrównania i czcionki
+                plt.text(width + 0.1, y_position + bar.get_height() / 2,
+                         job,
+                         va='center', ha='left', fontsize=10, color='purple',fontweight='bold')
 
-            # Usunięcie górnej i prawej ramki
             plt.gca().spines['top'].set_visible(False)
             plt.gca().spines['right'].set_visible(False)
 
@@ -340,14 +290,9 @@ def create_plot(url, params):
             plt.gca().spines['bottom'].set_color('black')
             plt.gca().spines['bottom'].set_linewidth(4)
 
-            # Ustawienie liczb całkowitych na osi X
             plt.xticks(np.arange(0, max(counts) + 10, 1))
 
-            # Ustawienie limitu osi X (rozciągnięcie osi X)
-            plt.xlim(0, max(counts) * 1.1)  # Ustawia zakres osi X
-
-            # Pokazanie wykresu
-            #plt.show()
+            plt.xlim(0, max(counts) * 1.1)
 
             buf = io.BytesIO()
             plt.savefig(buf, format='png')
@@ -364,27 +309,20 @@ def create_plot(url, params):
 
             data = response.json()
 
-            # Zliczamy oferty pracy na pełny etat, część etatowe oraz brak danych
             full_time_count = 0
             part_time_count = 0
-            unknown_count = 0  # Liczba ofert, dla których nie ma informacji o etacie
+            unknown_count = 0
 
             for job in data['results']:
-                contract_time = job.get('contract_time', '').lower()  # Pobieramy typ umowy i zamieniamy na małe litery
+                contract_time = job.get('contract_time', '').lower()
 
                 if contract_time == 'full_time':
                     full_time_count += 1
                 elif contract_time == 'part_time':
                     part_time_count += 1
                 else:
-                    unknown_count += 1  # Oferty, które nie mają danych o etacie lub mają inne wartości
+                    unknown_count += 1
 
-            # Wyświetlenie zgromadzonych danych w konsoli
-            '''print(f"Liczba ofert pełnoetatowych: {full_time_count}")
-            print(f"Liczba ofert część etatowych: {part_time_count}")
-            print(f"Liczba ofert bez informacji o etacie: {unknown_count}")'''
-
-            # Przygotowanie listy do wykresu, usuwamy kategorie z liczbą ofert równą 0
             labels = []
             sizes = []
 
@@ -398,15 +336,13 @@ def create_plot(url, params):
                 labels.append('Brak danych')
                 sizes.append(unknown_count)
 
-            # Tworzymy wykres tylko jeśli są dostępne jakiekolwiek oferty
             if sizes:
                 plt.figure(figsize=(8, 6))
                 plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90,
-                        colors=['#66b3ff', '#99ff99', '#ffcc99'])  # Pogrubienie granic i zmiana koloru granicy)
+                        colors=['#66b3ff', '#99ff99', '#ffcc99'])
                 plt.title('Procent ofert pracy ze względu na etat')
-                plt.axis('equal')  # Upewniamy się, że wykres jest okrągły
+                plt.axis('equal')
 
-                # Wyświetlenie wykresu
                 plt.tight_layout()
 
                 buf = io.BytesIO()
@@ -424,27 +360,20 @@ def create_plot(url, params):
 
             data = response.json()
 
-            # Zliczamy oferty pracy na pełny etat, część etatowe oraz brak danych
             contract_count = 0
             permanent_count = 0
-            unknown_count = 0  # Liczba ofert, dla których nie ma informacji o etacie
+            unknown_count = 0
 
             for job in data['results']:
-                contract_type = job.get('contract_type', '').lower()  # Pobieramy typ umowy i zamieniamy na małe litery
+                contract_type = job.get('contract_type', '').lower()
 
                 if contract_type == 'contract':
                     contract_count += 1
                 elif contract_type == 'permanent':
                     permanent_count += 1
                 else:
-                    unknown_count += 1  # Oferty, które nie mają danych o etacie lub mają inne wartości
+                    unknown_count += 1
 
-            # Wyświetlenie zgromadzonych danych w konsoli
-            '''print(f"Liczba ofert stałych: {permanent_count}")
-            print(f"Liczba ofert na umowę: {contract_count}")
-            print(f"Liczba ofert bez informacji o typie umowy: {unknown_count}")'''
-
-            # Przygotowanie listy do wykresu, usuwamy kategorie z liczbą ofert równą 0
             labels = []
             sizes = []
 
@@ -458,18 +387,15 @@ def create_plot(url, params):
                 labels.append('Brak danych')
                 sizes.append(unknown_count)
 
-            # Tworzymy wykres tylko jeśli są dostępne jakiekolwiek oferty
             if sizes:
                 plt.figure(figsize=(8, 6))
                 plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90,
-                        colors=['#F3B06A', '#FDF041', '#FD4B41'])  # Pogrubienie granic i zmiana koloru granicy)
+                        colors=['#F3B06A', '#FDF041', '#FD4B41'])
                 plt.title('Procent ofert pracy ze względu na typ umowy')
-                plt.axis('equal')  # Upewniamy się, że wykres jest okrągły
+                plt.axis('equal')
 
-                # Dostosowanie przestrzeni wokół wykresu (przesunięcie wykresu w dół)
-                plt.subplots_adjust(top=1.25)  # Zwiększenie odstępu na górze
+                plt.subplots_adjust(top=1.25)
 
-                # Wyświetlenie wykresu
                 plt.tight_layout()
 
                 buf = io.BytesIO()
@@ -489,32 +415,23 @@ def create_plot(url, params):
     return uri_tab
 
 def create_plot_earnings(url):
-    # Wyślij zapytanie HTTP
+
     response = requests.get(url)
 
     data = response.json()
-    # print(data['month'])
+
     data = data['month']
 
-    dwuwymiarowa_tablica = [[klucz, wartosc] for klucz, wartosc in data.items()]  # Wyświetlenie wyniku
+    dwuwymiarowa_tablica = [[klucz, wartosc] for klucz, wartosc in data.items()]
 
     for i in range(len(dwuwymiarowa_tablica)):
         dwuwymiarowa_tablica[i][0] = datetime.strptime(dwuwymiarowa_tablica[i][0], '%Y-%m')
-        # print(i, dwuwymiarowa_tablica[i][0])
 
     posortowana_tablica = sorted(dwuwymiarowa_tablica, key=lambda x: x[0], reverse=False)
 
-    '''for i in range(len(posortowana_tablica)):
-        print(i + 1, posortowana_tablica[i][0], posortowana_tablica[i][1])'''
-
-        # WYKRESSSSSSS------------------------------------------------------------------
-
-    # Przygotowanie danych do wykresu
     miesiace = [item[0] for item in posortowana_tablica]
     salary = [item[1] for item in posortowana_tablica]
 
-    # Przygotowanie danych do regresji
-    # Przekształcamy daty na liczby (miesiące od początku)
     dates_as_numbers = np.array([(date - min(miesiace)).days // 30 for date in miesiace])
 
     # Dodanie stałej (intercept) do danych (ważne dla regresji)
@@ -529,9 +446,8 @@ def create_plot_earnings(url):
     predictions = results.predict(X)
 
     # Przewidywanie wartości na 3 przyszłe miesiące
-    # Załóżmy, że ostatnia data to ostatni miesiąc w Twoich danych
     last_month = miesiace[-1]
-    future_months = [last_month + relativedelta(months=i) for i in range(1, 4)]  # Dodać 3 miesiące
+    future_months = [last_month + relativedelta(months=i) for i in range(1, 4)]
 
     # Tworzymy nowe dane (liczby miesięcy) do predykcji
     future_months_as_numbers = np.array([(date - min(miesiace)).days // 30 for date in future_months])
@@ -540,22 +456,16 @@ def create_plot_earnings(url):
     # Przewidywanie na przyszłość
     future_predictions = results.predict(X_future)
 
-    # Dodajemy te przewidywania do listy miesięcy i wynagrodzeń
     miesiace_future = miesiace + future_months
     salary_future = salary + list(future_predictions)
 
-    # Tworzenie wykresu
     plt.figure(figsize=(10, 6))
-    # plt.plot(miesiace, salary, marker='o', linestyle='-', color='teal')
 
-    # Rysowanie wykresu z kolorami w zależności od wzrostu/spadku wynagrodzenia
     for i in range(1, len(miesiace)):
-        # Jeżeli wynagrodzenie wzrosło
         if salary[i] > salary[i - 1]:
-            plt.plot(miesiace[i - 1:i + 1], salary[i - 1:i + 1], marker='o', color='green')  # Zielony dla wzrostu
-        # Jeżeli wynagrodzenie spadło
+            plt.plot(miesiace[i - 1:i + 1], salary[i - 1:i + 1], marker='o', color='green')
         elif salary[i] < salary[i - 1]:
-            plt.plot(miesiace[i - 1:i + 1], salary[i - 1:i + 1], marker='o', color='red')  # Czerwony dla spadku
+            plt.plot(miesiace[i - 1:i + 1], salary[i - 1:i + 1], marker='o', color='red')
 
     plt.plot(miesiace, predictions, linestyle='--', label='Regresja liniowa', color='grey')
     plt.plot(miesiace_future, salary_future, linestyle=':', label='Przewidywania (3 miesiące)', color='#F08080')
@@ -565,23 +475,19 @@ def create_plot_earnings(url):
     slope = results.params[1]
 
     # Dodanie równania na wykresie
-    equation = f'y = {slope:.2f}x + {intercept:.2f}'  # Formatowanie do dwóch miejsc po przecinku
+    equation = f'y = {slope:.2f}x + {intercept:.2f}'
     plt.text(0.05, 0.95, equation, transform=plt.gca().transAxes, fontsize=12, verticalalignment='top', color='black')
 
-    # Formatowanie wykresu
     plt.title('Wysokość wynagrodzeń w czasie z regresją liniową i przewidywaniami', fontsize=16)
     plt.xlabel('Miesiące', fontsize=12)
     plt.ylabel('Wysokość wynagrodzenia', fontsize=12)
 
-    # Dostosowanie formatu daty na osi X, aby wyświetlały się po polsku
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
 
-    # Wyświetlenie wszystkich miesięcy na osi X, z rotacją etykiet
     all_months = miesiace + future_months
     plt.xticks(all_months, rotation=45)
     plt.grid(True)
 
-    # Wyświetlanie wykresu
     plt.tight_layout()
 
     buf = io.BytesIO()
@@ -606,15 +512,11 @@ def create_plot_offers(params):
 
         response = requests.get(url, params=params)
 
-        # print(response.status_code)
-
         response_json = response.json()
 
         response_full = response_full + response_json['results']
 
         j = j + 9
-
-    # print(len(response_full))
 
     wystapienia = []
 
@@ -642,42 +544,25 @@ def create_plot_offers(params):
 
         ilosc_ofert.append(ilosc_w_miesiacu)
 
-    '''for i in range(len(ilosc_ofert)):
-        print(ilosc_ofert[i][0], ilosc_ofert[i][1])'''
-
-    # ile_stron - ile stron po 50 ofert (jesli nie wychodzi poza ilosc dostepnych danych)
-    # ilosc_ofert - pierwsza kolumna: miesiąc, druga kolumna: ilość dodanych ofert
-
-    # ------------WYKRESSSSSSS--------------------------------------
-    # Tworzymy DataFrame dla łatwiejszej analizy
     df = pd.DataFrame(ilosc_ofert, columns=["Miesiąc", "Liczba ofert"])
 
-    # Używamy pd.to_datetime, aby upewnić się, że mamy odpowiedni typ daty
     df["Miesiąc"] = pd.to_datetime(df["Miesiąc"])
-    # Sortowanie po kolumnie "Miesiąc"
+
     df = df.sort_values("Miesiąc")
 
-    # Formatowanie daty na osi X w formacie 'MMM YYYY' (np. Jan 2024)
     df["Miesiąc"] = df["Miesiąc"].dt.strftime('%b %Y')
 
-    # Tworzymy wykres
     plt.figure(figsize=(10, 6))
     plt.plot(df["Miesiąc"], df["Liczba ofert"], marker='o', linestyle='-', color='#ff78dc')
 
-    # Tytuł i etykiety
     plt.title('Liczba dodanych ofert pracy na dany zawód w czasie', fontsize=16)
     plt.xlabel('Miesiąc', fontsize=12)
     plt.ylabel('Liczba ofert', fontsize=12)
 
-    # Ustawienie etykiet osi X jako skróty miesięcy i roku
     plt.xticks(rotation=45)
 
-    # Włączanie siatki i dostosowanie układu
     plt.grid(True)
     plt.tight_layout()
-
-    # Wyświetlenie wykresu
-    #plt.show()
 
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
@@ -699,15 +584,11 @@ def create_plot_offers(params):
 
         response = requests.get(url, params=params)
 
-        # print(response.status_code)
-
         response_json = response.json()
 
         response_full = response_full + response_json['results']
 
         j = j + 9
-
-    # print(len(response_full))
 
     now = dt.datetime.now()
     miesiac = now.month
@@ -759,45 +640,29 @@ def create_plot_offers(params):
 
     ilosc_ofert = ilosc_ofert_miesiac_min_1 + ilosc_ofert_miesiac
 
-    '''for i in range(len(ilosc_ofert)):
-        print(ilosc_ofert[i][0], ilosc_ofert[i][1])'''
-
-    # ------------WYKRESSSSSSS--------------------------------------
-    # Tworzymy DataFrame dla łatwiejszej analizy
     df = pd.DataFrame(ilosc_ofert, columns=["Dzień", "Liczba ofert"])
 
-    # Używamy pd.to_datetime, aby upewnić się, że mamy odpowiedni typ daty
     df["Dzień"] = pd.to_datetime(df["Dzień"])
 
-    # Formatowanie daty na osi X w formacie 'MMM YYYY' (np. Jan 2024)
     df["Dzień"] = df["Dzień"].dt.strftime('%d/%m/%Y')
 
-    # Tworzymy wykres
     plt.figure(figsize=(10, 6))
     plt.plot(df["Dzień"], df["Liczba ofert"], marker='o', linestyle='-', color='#9de0ad')
 
-    # Tytuł i etykiety
     plt.title('Liczba dodanych ofert pracy na dany zawód dziennie', fontsize=16)
     plt.xlabel('Dzień', fontsize=12)
     plt.ylabel('Liczba ofert', fontsize=12)
 
-    # Ustawienie etykiet osi X co 5 dat:
-    # Obliczamy co 5 datę i ustawiamy etykiety ręcznie
     step = 5
-    tick_indices = list(range(0, len(df), step))  # Indeksy co 5 datę
-    tick_labels = df["Dzień"].iloc[tick_indices]  # Etykiety odpowiadające tym indeksom
+    tick_indices = list(range(0, len(df), step))
+    tick_labels = df["Dzień"].iloc[tick_indices]
     plt.xticks(tick_indices, tick_labels, rotation=45)
 
-    # Ustawienie wartości osi Y co 5:
     y_ticks = range(0, max(df["Liczba ofert"]) + 5, 5)
     plt.yticks(y_ticks)
 
-    # Włączanie siatki i dostosowanie układu
     plt.grid(True)
     plt.tight_layout()
-
-    # Wyświetlenie wykresu
-    #plt.show()
 
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
@@ -814,22 +679,18 @@ def analiza_opisowa_dane(url, params):
 
     response = requests.get(url, params=params)
 
-    # print(response.status_code)
-
-    response_json = response.json()  # Zamiana z JSON na słownik Python
+    response_json = response.json()
 
     dane_tab = {}
 
     # Sprawdzenie, czy w odpowiedzi są wyniki
     if 'results' in response_json and response_json['results']:
-        jobs = []  # Lista, w której będziemy przechowywać oferty pracy
-        region_count = defaultdict(int)  # Słownik do zliczania ofert w województwach
-        # salary_data = []  # Lista, w której będziemy przechowywać dane o wynagrodzeniu
-        company_count = defaultdict(int)  # Słownik do zliczania ofert w firmach
-        job_count = defaultdict(int)  # Słownik do zliczania ofert według stanowisk
-        salary_data = defaultdict(int)  # Słownik: klucz=(company_name, salary_min, salary_max), wartość=liczba ofert
+        jobs = []
+        region_count = defaultdict(int)
+        company_count = defaultdict(int)
+        job_count = defaultdict(int)
+        salary_data = defaultdict(int)
 
-        # Pętla po wynikach
         for i in response_json['results']:
             job = []
 
@@ -839,35 +700,27 @@ def analiza_opisowa_dane(url, params):
             location = i.get('location', {}).get('display_name', 'Brak lokalizacji')
             description = i.get('description', 'Brak opisu')
 
-            salary_min = i.get('salary_min', None)  # Minimalne wynagrodzenie
-            salary_max = i.get('salary_max', None)  # Maksymalne wynagrodzenie
+            salary_min = i.get('salary_min', None)
+            salary_max = i.get('salary_max', None)
 
             if salary_min is not None and salary_max is not None:
-                # Dodawanie unikalnych kombinacji firmy i widełek wynagrodzenia
                 salary_data[(company_name, salary_min, salary_max)] += 1
 
-            # Przypisanie województwa
-            region = location.split(",")[-1].strip()  # Zakłada się, że województwo jest na końcu lokalizacji
+            region = location.split(",")[-1].strip()
 
-            # Zliczanie ofert pracy w województwie
             region_count[region] += 1
 
-            # Zliczanie ofert pracy w firmach
             company_count[company_name] += 1
 
-            # Zliczanie ofert pracy według stanowisk
             job_count[job_title] += 1
 
-            # Dodanie oferty do listy jobs
             job.append(job_title)
             job.append(company_name)
             job.append(location)
             job.append(description)
 
-            # Dodanie do ogólnej listy 'jobs'
             jobs.append(job)
 
-        # Analiza liczby ofert wg regionów
         sorted_regions = sorted(region_count.items(), key=lambda x: x[1], reverse=True)
         regions, countss = zip(*sorted_regions)
         slowo = "województwo "
@@ -887,7 +740,6 @@ def analiza_opisowa_dane(url, params):
         dane_tab['percent_counts_regions'] = percent_counts_regions
         dane_tab['top_region_counts'] = top_region_counts
 
-        # Analiza liczby ofert wg firm
         sorted_companies = sorted(company_count.items(), key=lambda x: x[1], reverse=True)
         companies, counts = zip(*sorted_companies)
         top_company = companies[0]
@@ -906,23 +758,22 @@ def analiza_opisowa_dane(url, params):
         dane_tab['sum_counts'] = sum_counts
 
         if salary_data:
-            # Analiza zarobkow wg firm
+
             companies, min_salaries, max_salaries = zip(*salary_data)
 
-            # Szukamy min i max płac
-            max_min_salary = max(min_salaries)  # Najwyższa minimalna pensja
+            max_min_salary = max(min_salaries)
             min_min_salary = min(min_salaries)
             max_max_salary = max(max_salaries)
             min_max_salary = min(max_salaries)
-            index_of_max_min_salary = min_salaries.index(max_min_salary)  # Indeks tej pensji
+            index_of_max_min_salary = min_salaries.index(max_min_salary)
             index_of_max_max_salary = max_salaries.index(max_max_salary)
             index_of_min_min_salary = min_salaries.index(min_min_salary)
             index_of_min_max_salary = max_salaries.index(min_max_salary)
-            # Ile razy coś jest większe
+
             ile_razy_min_salary = round(max_min_salary / min_min_salary, 1)
             ile_razy_max_salary = round(max_max_salary / min_max_salary, 1)
             slowoo = "również "
-            # Szukamy firm najlepszych
+
             company_with_max_min_salary = companies[index_of_max_min_salary]
             company_with_max_max_salary = companies[index_of_max_max_salary]
             company_with_min_min_salary = companies[index_of_min_min_salary]
@@ -943,11 +794,9 @@ def analiza_opisowa_dane(url, params):
         else:
             print("Brak danych o wynagrodzeniach")
 
-        # Sortowanie stanowisk według liczby ofert
         sorted_jobs = sorted(job_count.items(), key=lambda x: x[1], reverse=True)
 
-        # Tworzenie wykresu słupkowego poziomego
-        job_titles, countsss = zip(*sorted_jobs)  # Rozpakowanie krotek do dwóch list (stanowiska i liczba ofert)
+        job_titles, countsss = zip(*sorted_jobs)
         sum_counts_jobs = sum(countsss)
         max_counts_jobs = countsss[0]
         job_with_max_offers = job_titles[0]
@@ -976,15 +825,11 @@ def analiza_opisowa_dane(url, params):
 
         response = requests.get(url, params=params)
 
-        # print(response.status_code)
-
         response_json = response.json()
 
         response_full = response_full + response_json['results']
 
         j = j + 9
-
-        # print(len(response_full))
 
     wystapienia = []
 
@@ -1011,28 +856,22 @@ def analiza_opisowa_dane(url, params):
 
         ilosc_ofert.append(ilosc_w_miesiacu)
 
-    # Słownik mapujący numer miesiąca na pełną nazwę miesiąca po polsku
     miesiace = {
         1: "styczeń", 2: "luty", 3: "marzec", 4: "kwiecień", 5: "maj", 6: "czerwiec",
         7: "lipiec", 8: "sierpień", 9: "wrzesień", 10: "październik", 11: "listopad", 12: "grudzień"
     }
 
-    # Funkcja zamieniająca numer miesiąca na polską nazwę miesiąca
     def get_polish_month(month_number):
         return miesiace.get(month_number, "Nieznany miesiąc")
 
-    max_oferta = max(ilosc_ofert, key=lambda x: x[1])  # Znajdź miesiąc z maksymalną liczbą ofert
-    max_miesiac = max_oferta[0]  # Miesiąc z największą liczbą ofert
+    max_oferta = max(ilosc_ofert, key=lambda x: x[1])
 
-    max_liczba_ofert = max_oferta[1]  # Liczba ofert w tym miesiącu
+    max_liczba_ofert = max_oferta[1]
 
-    max_miesiac = max_oferta[0].month  # Wyciągamy numer miesiąca z daty
+    max_miesiac = max_oferta[0].month
 
-    # Teraz używamy funkcji get_polish_month, aby zamienić numer miesiąca na nazwę
     polski_miesiac = get_polish_month(max_miesiac)
     rok_do_miesiaca = max_oferta[0].year
-
-    # Zamiana numeru miesiąca na nazwę w języku polskim
 
     dane_tab['max_liczba_ofert'] = max_liczba_ofert
     dane_tab['polski_miesiac'] = polski_miesiac
@@ -1045,21 +884,18 @@ def home(request):
     return render(request, "Home.html")
 
 def oferty_pracy_disp(request):
-    # id i klucze
+
     API_ID = 'd85d9e1a'
     API_KEY = 'c36f6bf6947de94278ed9f035eddfc8e'
 
-    # Ustawienia zapytania
     global nr_strony, nazwa_miasta, nazwa_zawodu, odleglosc, minimalna
 
-    #url = f'https://api.adzuna.com/v1/api/jobs/pl/search/{nr_strony}'
     params = {
         'app_id': API_ID,
         'app_key': API_KEY,
         'results_per_page': 15,
-        'what': nazwa_zawodu,  # przykładowe wyszukiwanie
+        'what': nazwa_zawodu,
         'where': nazwa_miasta,
-        #'distance': odleglosc,
         'salary_min': minimalna,
     }
 
@@ -1068,66 +904,47 @@ def oferty_pracy_disp(request):
         nastepny_value = request.POST.get('nastepny')
         if nastepny_value:
             nr_strony = nr_strony + int(nastepny_value)
-            #print(nr_strony)
 
         poprzedni_value = request.POST.get('poprzedni')
         if poprzedni_value and nr_strony > 1:
-            nr_strony = nr_strony - int(poprzedni_value)
-            #print(nr_strony)
+            wyczysc_filtr = request.POST.get('wyczysc_filtr')
 
-        wyczysc_filtr = request.POST.get('wyczysc_filtr')
         if wyczysc_filtr:
             nazwa_miasta = ''
             nazwa_zawodu = ''
-            #odleglosc = ''
             minimalna = 0
 
             params['where'] = str(nazwa_miasta)
             params['what'] = str(nazwa_zawodu)
-            #params['distance'] = odleglosc
             params['salary_min'] = minimalna
             nr_strony = 1
 
         form = MyForm(request.POST)
         if form.is_valid():
 
-            #miasto
             if form.cleaned_data['miasto']:
                 nazwa_miasta = form.cleaned_data['miasto']
                 if nazwa_miasta == 'empty_string': nazwa_miasta = ''
                 params['where'] = str(nazwa_miasta)
                 nr_strony = 1
 
-            #zawod
             if form.cleaned_data['zawod']:
                 nazwa_zawodu = form.cleaned_data['zawod']
                 if nazwa_zawodu == 'empty_string': nazwa_zawodu = ''
                 params['what'] = str(nazwa_zawodu)
                 nr_strony = 1
 
-            #odleglosc
-            '''if form.cleaned_data['odleglosc_od']:
-                odleglosc = form.cleaned_data['odleglosc_od']
-                if odleglosc == 'empty_string': odleglosc = ''
-                params['distance'] = str(odleglosc)
-                nr_strony = 1'''
-
-            #minimalna pensja
             if form.cleaned_data['minimalna_pensja']:
                 minimalna = form.cleaned_data['minimalna_pensja']
                 if minimalna == 'empty_string': minimalna = ''
                 params['salary_min'] = minimalna
                 nr_strony = 1
 
-
-
     url = f'https://api.adzuna.com/v1/api/jobs/pl/search/{nr_strony}'
 
     form = MyForm()
 
     time.sleep(1)
-
-    #print(params)
 
     try:
         jobs = jobs_get(url, params)
@@ -1138,30 +955,26 @@ def oferty_pracy_disp(request):
 
 def analiza_wykresy(request):
 
-    # Adzuna - id i klucze
     API_ID = 'd85d9e1a'
     API_KEY = 'c36f6bf6947de94278ed9f035eddfc8e'
 
-    # Ustawienia zapytania
     url = 'https://api.adzuna.com/v1/api/jobs/pl/search/1'
     params = {
         'app_id': API_ID,
         'app_key': API_KEY,
         'results_per_page': 300,
-        'what': '',  # przykładowe wyszukiwanie
-        'where': ''  # Możesz określić lokalizację, jeśli chcesz
+        'what': '',
+        'where': ''
     }
 
     if request.method == 'POST':
         form = MyForm_1(request.POST)
         if form.is_valid():
 
-            #if form.cleaned_data['miasto_wykres']:
             nazwa_miasta_wykres = form.cleaned_data['miasto_wykres']
-            #print(nazwa_miasta_wykres)
+
             params['where'] = str(nazwa_miasta_wykres)
 
-            #if form.cleaned_data['zawod_wykres']:
             nazwa_zawodu_wykres = form.cleaned_data['zawod_wykres']
             params['what'] = str(nazwa_zawodu_wykres)
 
@@ -1172,10 +985,6 @@ def analiza_wykresy(request):
 
                 params['where'] = str(nazwa_miasta_wykres)
                 params['what'] = str(nazwa_zawodu_wykres)
-
-                # Wysłanie zapytania GET do API
-
-    #print(params)
 
     form = MyForm_1()
 
@@ -1206,17 +1015,13 @@ def analiza_pensje(request):
         form = MyForm_2(request.POST)
         if form.is_valid():
 
-            #if form.cleaned_data['miasto_wykres']:
             skrot_kraju = form.cleaned_data['skrot_kraju']
-            #print(skrot_kraju)
             country = skrot_kraju.lower()
 
             wyczysc_filtr = request.POST.get('wyczysc_filtr')
             if wyczysc_filtr:
                 country = 'pl'
 
-
-    # Ustawienia zapytania
     url = f'https://api.adzuna.com/v1/api/jobs/{country}/history?app_id=d85d9e1a&app_key=c36f6bf6947de94278ed9f035eddfc8e&months={months_back}'  # numer na koncu to strona
 
     form = MyForm_2()
@@ -1229,24 +1034,20 @@ def analiza_pensje(request):
 
 def analiza_ilosc(request):
 
-    # id i klucze
     API_ID = 'd85d9e1a'
     API_KEY = 'c36f6bf6947de94278ed9f035eddfc8e'
 
-    # Ustawienia zapytania
     params = {
         'app_id': API_ID,
         'app_key': API_KEY,
         'results_per_page': 50,
-        'what': '',  # przykładowe wyszukiwanie
-        # 'where': 'Warsaw'
+        'what': 'software developer'
     }
 
     if request.method == 'POST':
         form = MyForm_3(request.POST)
         if form.is_valid():
 
-            #if form.cleaned_data['zawod_wykres']:
             nazwa_zawodu_wykres = form.cleaned_data['zawod_wykres_2']
             params['what'] = str(nazwa_zawodu_wykres)
 
@@ -1268,30 +1069,26 @@ def analiza_ilosc(request):
 
 def analiza_opisowa(request):
 
-    # Adzuna - id i klucze
     API_ID = 'd85d9e1a'
     API_KEY = 'c36f6bf6947de94278ed9f035eddfc8e'
 
-    # Ustawienia zapytania
     url = 'https://api.adzuna.com/v1/api/jobs/pl/search/1'
     params = {
         'app_id': API_ID,
         'app_key': API_KEY,
         'results_per_page': 300,
-        'what': '',  # przykładowe wyszukiwanie
-        'where': ''  # Możesz określić lokalizację, jeśli chcesz
+        'what': '',
+        'where': ''
     }
 
     if request.method == 'POST':
         form = MyForm_4(request.POST)
         if form.is_valid():
 
-            # if form.cleaned_data['miasto_wykres']:
             nazwa_miasta_wykres = form.cleaned_data['miasto_wykres']
-            # print(nazwa_miasta_wykres)
+
             params['where'] = str(nazwa_miasta_wykres)
 
-            # if form.cleaned_data['zawod_wykres']:
             nazwa_zawodu_wykres = form.cleaned_data['zawod_wykres']
             params['what'] = str(nazwa_zawodu_wykres)
 
@@ -1302,8 +1099,6 @@ def analiza_opisowa(request):
 
                 params['where'] = str(nazwa_miasta_wykres)
                 params['what'] = str(nazwa_zawodu_wykres)
-
-                # Wysłanie zapytania GET do API
 
     form = MyForm_4()
 
@@ -1321,18 +1116,10 @@ def analiza_ilosc_2(request):
         dates = [start_date + dt.timedelta(days=(i // increment)) for i in range(n)]
         return dates
 
-    #BASE_DIR = os.Path('Job_analizer').resolve().parent.parent  # Corrected BASE_DIR
-    #file_path = os.path.join(BASE_DIR, "Job_analizer", "Jobs_data.xlsx")  # Corrected file path
-    #saved_data = pd.read_excel(file_path, sheet_name='Sheet1')  # Ensure pandas is correctly used
     saved_data = pd.read_excel('/opt/render/project/src/Job_analizer/Jobs_data.xlsx',sheet_name='Sheet1')
 
-
-    # Data początkowa
     start_date = datetime(2024, 12, 15)
 
-    # Funkcja do generowania dat z przyrostem co 200 wierszy
-
-    # Dodanie nowej kolumny do DataFrame
     saved_data['Data_pobrania'] = generate_dates(len(saved_data), start_date, 200)
 
     kategoria_col = np.array([])
