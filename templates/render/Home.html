@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jobs Analyzer</title>
     <style>
-        body {
+     		body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
@@ -20,7 +20,7 @@
             width: 100%;
             position: fixed;
             top: 0;
-            z-index: 1000; /* Ensure it stays on top */
+            z-index: 1000;
         }
         nav {
             background-color: #333;
@@ -28,14 +28,16 @@
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 60px; /* Just below the header */
+            top: 60px;
             bottom: 0;
+            margin-top: 60px;
         }
         nav a {
             padding: 14px 20px;
             color: white;
             text-align: left;
             text-decoration: none;
+
         }
         nav a:hover {
             background-color: #575757;
@@ -43,8 +45,8 @@
         main {
             padding: 20px;
             flex-grow: 1;
-            margin-left: 200px; /* Avoid overlap with nav */
-            margin-top: 100px; /* Avoid overlap with header */
+            margin-left: 200px;
+            margin-top: 100px;
         }
         .card {
             background-color: white;
@@ -63,27 +65,36 @@
             bottom: 0;
             width: 100%;
         }
-		.dropdown {
-            float: left;
-            overflow: hidden;
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 10px;
+            margin-right: 10px;
         }
         .dropdown .dropbtn {
             font-size: 16px;
             border: none;
             outline: none;
             color: white;
-            padding: 14px 16px;
-            background-color: inherit;
-            font-family: inherit;
-            margin: 0;
+            padding: 10px 20px;
+            background-color: #4682b4;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+            border-radius: 5px;
+        }
+        .dropdown .dropbtn:hover {
+            background-color: #5a9bd3;
         }
         .dropdown-content {
             display: none;
             position: absolute;
             background-color: #333;
+            color: white;
             min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             z-index: 1;
+            border-radius: 5px;
         }
         .dropdown-content a {
             float: none;
@@ -92,12 +103,38 @@
             text-decoration: none;
             display: block;
             text-align: left;
+            transition: background-color 0.3s;
+            border-radius: 5px;
         }
         .dropdown-content a:hover {
             background-color: #575757;
+            border-radius: 5px;
         }
-        .dropdown:hover .dropdown-content {
-            display: block;
+        form {
+            display: inline-block;
+            margin: 0;
+        }
+        button[type="submit"] {
+            background-color: #4682b4;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        button[type="submit"]:hover {
+            background-color: #5a9bd3;
+        }
+        .button-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .button-container form {
+            margin: 0;
         }
     </style>
 </head>
