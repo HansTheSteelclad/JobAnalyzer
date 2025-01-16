@@ -908,7 +908,7 @@ def oferty_pracy_disp(request):
         poprzedni_value = request.POST.get('poprzedni')
         if poprzedni_value and nr_strony > 1:
             wyczysc_filtr = request.POST.get('wyczysc_filtr')
-
+        wyczysc_filtr = request.POST.get('wyczysc_filtr')
         if wyczysc_filtr:
             nazwa_miasta = ''
             nazwa_zawodu = ''
